@@ -1,7 +1,7 @@
 # Bernstein Polynomial Basis
 
 * [GitHub](https://github.com/eschnett/Bernstein.jl): Source code repository
-* [![GitHub CI](https://github.com/eschnett/Bernstein.jl/workflows/CI/badge.svg)](https://github.com/eschnett/Bernsteinn.jl/actions)
+* [![GitHub CI](https://github.com/eschnett/Bernstein.jl/workflows/CI/badge.svg)](https://github.com/eschnett/Bernstein.jl/actions)
 
 The Bernstein polynomials form a basis for polynomials living on
 simplices. This package calculates the Bernstein polynomials for
