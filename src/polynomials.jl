@@ -12,44 +12,55 @@ The order of approximation is given implicity by `sum(α)`.
 """
 bernstein
 
-function bernstein(s::SVector{N, <: Chain{V, 1, T}},
-                   α::SVector{N, UInt},
-                   λ::Chain{V1, 1, T}
-                   ) where {N, V, V1, T}
-    D = ndims(V)
-    @assert N == D+1
-    D1 = ndims(V1)
-    @assert D1 == D+1
+function bernstein(α::SVector{N, UInt}, λ::SVector{N, T}) where {N, T}
     n = sum(α)
 
     # TODO: Handle factorials better
     T(factorial(n)) * prod(λ[i]^α[i] / T(factorial(α[i])) for i in 1:N)::T
 end
 
-function bernstein(s::SVector{N, <: Chain{V, 1, T}},
-                   α::SVector{N, UInt},
-                   x::Chain{V, 1, T}
-                   ) where {N, V, T}
-    D = ndims(V)
+bernstein(α::SVector{N, <: Integer}, λ::SVector{N}) where {N} =
+    bernstein(UInt.(α), λ)
+
+
+
+function bernstein(s::SMatrix{D, N, T}, α::SVector{N, UInt}, x::SVector{D, T}
+                   ) where {D, N, T}
     @assert N == D+1
 
     λ = cartesian2barycentric(s, x)
-    bernstein(s, α, λ)
+    bernstein(α, λ)
 end
 
-function bernstein(s::SVector{N, <: Chain{V, 1, T}},
-                   α::SVector{N, Int},
-                   x::Chain{V1, 1, T}
-                   ) where {N, V, V1, T}
+function bernstein(s::SMatrix{D, N, T}, α::SVector{N, <: Integer},
+                   x::SVector{D, T}) where {D, N, T}
     bernstein(s, UInt.(α), x)
 end
 
 
 
-# function bernstein_barycentric_coefficients(s::SVector{N, <: Chain{V, 1, T}},
+export bernstein_setup
+bernstein_setup(s) = cartesian2barycentric_setup(s)
+
+function bernstein(setup::BarycentricSetup{N, T}, α::SVector{N, UInt},
+                   x::SVector{D, T}
+                   ) where {N, D, T}
+    @assert N == D+1
+
+    λ = cartesian2barycentric(setup, x)
+    bernstein(α, λ)
+end
+
+function bernstein(setup::BarycentricSetup{N, T}, α::SVector{N, <: Integer},
+                   x::SVector{D, T}) where {D, N, T}
+    bernstein(setup, UInt.(α), x)
+end
+
+
+
+# function bernstein_barycentric_coefficients(s::SMatrix{D, N, T}
 #                                             α::SVector{N, UInt}
-#                                             ) where {N, V, T}
-#     D = ndims(V)
+#                                             ) where {D, N, T}
 #     @assert N == D+1
 #     n = sum(α)
 # 
