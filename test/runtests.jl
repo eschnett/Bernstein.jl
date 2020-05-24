@@ -17,117 +17,117 @@ Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
 
 
 
-#TODO @testset "Barycentric coordinates for unit simplices D=$D" for D in 1:Dmax
-#TODO     T = Rat128
-#TODO     N = D+1
-#TODO 
-#TODO     # Test simple algorithm
-#TODO     for i in 1:100
-#TODO         p = rand(SVector{D, T})
-#TODO         λ = cartesian2barycentric(p)
-#TODO         @test sum(λ) == 1
-#TODO         p′ = barycentric2cartesian(λ)
-#TODO         @test p == p′
-#TODO     end
-#TODO 
-#TODO     # Test generic algorithm
-#TODO     s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
-#TODO     for iter in 1:100
-#TODO         p = rand(SVector{D, T})
-#TODO         λ = cartesian2barycentric(p)
-#TODO         λ′ = cartesian2barycentric(s, p)
-#TODO         @test λ == λ′
-#TODO         p′ = barycentric2cartesian(s, λ)
-#TODO         @test p == p′
-#TODO     end
-#TODO end
-#TODO 
-#TODO @testset "Barycentric coordinates for general simplices D=$D" for D in 1:Dmax
-#TODO     T = Rat128
-#TODO     N = D+1
-#TODO 
-#TODO     for iter in 1:100
-#TODO         s = rand(SMatrix{D, N, T})
-#TODO         p = rand(SVector{D, T})
-#TODO         λ = cartesian2barycentric(p)
-#TODO         @test sum(λ) == 1
-#TODO         p′ = barycentric2cartesian(λ)
-#TODO         @test p == p′
-#TODO     end
-#TODO end
-#TODO 
-#TODO 
-#TODO 
-#TODO @testset "Simple Bernstein polynomials D=$D" for D in 1:Dmax
-#TODO     T = Rat128
-#TODO     N = D+1
-#TODO 
-#TODO     s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
-#TODO 
-#TODO     if D == 1
-#TODO         b00(x) = oftype(x, 1)
-#TODO         b01(x) = x
-#TODO         b10(x) = 1-x
-#TODO         b02(x) = x^2
-#TODO         b11(x) = 2*x*(1-x)
-#TODO         b20(x) = (1-x)^2
-#TODO         b03(x) = x^3
-#TODO         b12(x) = 3*x^2*(1-x)
-#TODO         b21(x) = 3*x*(1-x)^2
-#TODO         b30(x) = (1-x)^3
-#TODO         for x1 in 0:1//3:1
-#TODO             x = SVector{D, T}(x1)
-#TODO             @test bernstein(s, SVector(0,0), x) == b00(x...)
-#TODO             @test bernstein(s, SVector(0,1), x) == b01(x...)
-#TODO             @test bernstein(s, SVector(1,0), x) == b10(x...)
-#TODO             @test bernstein(s, SVector(0,2), x) == b02(x...)
-#TODO             @test bernstein(s, SVector(1,1), x) == b11(x...)
-#TODO             @test bernstein(s, SVector(2,0), x) == b20(x...)
-#TODO             @test bernstein(s, SVector(0,3), x) == b03(x...)
-#TODO             @test bernstein(s, SVector(1,2), x) == b12(x...)
-#TODO             @test bernstein(s, SVector(2,1), x) == b21(x...)
-#TODO             @test bernstein(s, SVector(3,0), x) == b30(x...)
-#TODO         end
-#TODO     elseif D == 2
-#TODO         b000(x,y) = oftype(x, 1)
-#TODO         b001(x,y) = y
-#TODO         b010(x,y) = x 
-#TODO         b100(x,y) = 1 - x - y
-#TODO         b002(x,y) = y^2
-#TODO         b011(x,y) = 2 * x * y
-#TODO         b020(x,y) = x^2
-#TODO         b101(x,y) = 2 * (1 - x - y) * y
-#TODO         b110(x,y) = 2 * (1 - x - y) * x
-#TODO         b200(x,y) = (1 - x - y)^2
-#TODO         for x1 in 0:1//4:1//2, x2 in 0:1//4:1//2
-#TODO             x = SVector{D, T}(x1, x2)
-#TODO             @test bernstein(s, SVector(0,0,0), x) == b000(x...)
-#TODO             @test bernstein(s, SVector(0,0,1), x) == b001(x...)
-#TODO             @test bernstein(s, SVector(0,1,0), x) == b010(x...)
-#TODO             @test bernstein(s, SVector(1,0,0), x) == b100(x...)
-#TODO             @test bernstein(s, SVector(0,0,2), x) == b002(x...)
-#TODO             @test bernstein(s, SVector(0,1,1), x) == b011(x...)
-#TODO             @test bernstein(s, SVector(0,2,0), x) == b020(x...)
-#TODO             @test bernstein(s, SVector(1,0,1), x) == b101(x...)
-#TODO             @test bernstein(s, SVector(1,1,0), x) == b110(x...)
-#TODO             @test bernstein(s, SVector(2,0,0), x) == b200(x...)
-#TODO        end
-#TODO     elseif D == 3
-#TODO         b0000(x,y,z) = oftype(x, 1)
-#TODO         b0001(x,y,z) = z
-#TODO         b0010(x,y,z) = y
-#TODO         b0100(x,y,z) = x 
-#TODO         b1000(x,y,z) = 1 - x - y - z
-#TODO         for x1 in 0:1//2:1//2, x2 in 0:1//2:1//2, x3 in 0:1//2:1//2
-#TODO             x = SVector{D, T}(x1, x2, x3)
-#TODO             @test bernstein(s, SVector(0,0,0,0), x) == b0000(x...)
-#TODO             @test bernstein(s, SVector(0,0,0,1), x) == b0001(x...)
-#TODO             @test bernstein(s, SVector(0,0,1,0), x) == b0010(x...)
-#TODO             @test bernstein(s, SVector(0,1,0,0), x) == b0100(x...)
-#TODO             @test bernstein(s, SVector(1,0,0,0), x) == b1000(x...)
-#TODO         end
-#TODO     end
-#TODO end
+@testset "Barycentric coordinates for unit simplices D=$D" for D in 1:Dmax
+    T = Rat128
+    N = D+1
+
+    # Test simple algorithm
+    for i in 1:100
+        p = rand(SVector{D, T})
+        λ = cartesian2barycentric(p)
+        @test sum(λ) == 1
+        p′ = barycentric2cartesian(λ)
+        @test p == p′
+    end
+
+    # Test generic algorithm
+    s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
+    for iter in 1:100
+        p = rand(SVector{D, T})
+        λ = cartesian2barycentric(p)
+        λ′ = cartesian2barycentric(s, p)
+        @test λ == λ′
+        p′ = barycentric2cartesian(s, λ)
+        @test p == p′
+    end
+end
+
+@testset "Barycentric coordinates for general simplices D=$D" for D in 1:Dmax
+    T = Rat128
+    N = D+1
+
+    for iter in 1:100
+        s = rand(SMatrix{D, N, T})
+        p = rand(SVector{D, T})
+        λ = cartesian2barycentric(p)
+        @test sum(λ) == 1
+        p′ = barycentric2cartesian(λ)
+        @test p == p′
+    end
+end
+
+
+
+@testset "Simple Bernstein polynomials D=$D" for D in 1:Dmax
+    T = Rat128
+    N = D+1
+
+    s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
+
+    if D == 1
+        b00(x) = oftype(x, 1)
+        b01(x) = x
+        b10(x) = 1-x
+        b02(x) = x^2
+        b11(x) = 2*x*(1-x)
+        b20(x) = (1-x)^2
+        b03(x) = x^3
+        b12(x) = 3*x^2*(1-x)
+        b21(x) = 3*x*(1-x)^2
+        b30(x) = (1-x)^3
+        for x1 in 0:1//3:1
+            x = SVector{D, T}(x1)
+            @test bernstein(s, SVector(0,0), x) == b00(x...)
+            @test bernstein(s, SVector(0,1), x) == b01(x...)
+            @test bernstein(s, SVector(1,0), x) == b10(x...)
+            @test bernstein(s, SVector(0,2), x) == b02(x...)
+            @test bernstein(s, SVector(1,1), x) == b11(x...)
+            @test bernstein(s, SVector(2,0), x) == b20(x...)
+            @test bernstein(s, SVector(0,3), x) == b03(x...)
+            @test bernstein(s, SVector(1,2), x) == b12(x...)
+            @test bernstein(s, SVector(2,1), x) == b21(x...)
+            @test bernstein(s, SVector(3,0), x) == b30(x...)
+        end
+    elseif D == 2
+        b000(x,y) = oftype(x, 1)
+        b001(x,y) = y
+        b010(x,y) = x 
+        b100(x,y) = 1 - x - y
+        b002(x,y) = y^2
+        b011(x,y) = 2 * x * y
+        b020(x,y) = x^2
+        b101(x,y) = 2 * (1 - x - y) * y
+        b110(x,y) = 2 * (1 - x - y) * x
+        b200(x,y) = (1 - x - y)^2
+        for x1 in 0:1//4:1//2, x2 in 0:1//4:1//2
+            x = SVector{D, T}(x1, x2)
+            @test bernstein(s, SVector(0,0,0), x) == b000(x...)
+            @test bernstein(s, SVector(0,0,1), x) == b001(x...)
+            @test bernstein(s, SVector(0,1,0), x) == b010(x...)
+            @test bernstein(s, SVector(1,0,0), x) == b100(x...)
+            @test bernstein(s, SVector(0,0,2), x) == b002(x...)
+            @test bernstein(s, SVector(0,1,1), x) == b011(x...)
+            @test bernstein(s, SVector(0,2,0), x) == b020(x...)
+            @test bernstein(s, SVector(1,0,1), x) == b101(x...)
+            @test bernstein(s, SVector(1,1,0), x) == b110(x...)
+            @test bernstein(s, SVector(2,0,0), x) == b200(x...)
+       end
+    elseif D == 3
+        b0000(x,y,z) = oftype(x, 1)
+        b0001(x,y,z) = z
+        b0010(x,y,z) = y
+        b0100(x,y,z) = x 
+        b1000(x,y,z) = 1 - x - y - z
+        for x1 in 0:1//2:1//2, x2 in 0:1//2:1//2, x3 in 0:1//2:1//2
+            x = SVector{D, T}(x1, x2, x3)
+            @test bernstein(s, SVector(0,0,0,0), x) == b0000(x...)
+            @test bernstein(s, SVector(0,0,0,1), x) == b0001(x...)
+            @test bernstein(s, SVector(0,0,1,0), x) == b0010(x...)
+            @test bernstein(s, SVector(0,1,0,0), x) == b0100(x...)
+            @test bernstein(s, SVector(1,0,0,0), x) == b1000(x...)
+        end
+    end
+end
 
 
 
