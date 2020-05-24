@@ -66,6 +66,5 @@ end
 # 
 #     # TODO: Handle factorials better
 #     nfact = T(factorial(n))
-#     #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-#     SVector{N, Tuple{T, T}}([(nfact / factorial(α[i]), α[i]) for i in 1:N])
+#     SVector{N, Tuple{T, T}}((nfact / factorial(α[i]), α[i]) for i in 1:N)
 # end

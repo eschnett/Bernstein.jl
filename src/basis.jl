@@ -8,8 +8,7 @@ orthogonal nor normalized)
 function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T, D, P}
     N = D+1
 
-    #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-    s = SMatrix{D, N}([T(a+1 == i) for a in 1:D, i in 1:N])
+    s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
 
     NP = P                # number of integration points per dimension
     NC = NP^D             # total number of integration points
@@ -17,14 +16,18 @@ function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T, D, P}
     @assert size(X1) == (NC, D)
     @assert size(W1) == (NC,)
     X = SMatrix{D, NC}(X1')
+    dump(X)
     W = SVector{NC}(W1)
 
     setup = bernstein_setup(s)
-    #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-    XX = SVector{NC}([X[:,i] for i in 1:NC])
+    # XX = SVector{NC}([X[:,i] for i in 1:NC])
+    # SVectors containing SVectors cause problems. We use the
+    # "Identity" type to hide the inner SVectors while constructing
+    # the outer ones.
+    # XX = SVector{NC}(X[:,i] for i in 1:NC)
+    XX = getindex.(SVector{NC}(Identity(X[:,i]) for i in 1:NC))
     ΛΛ = map(x -> cartesian2barycentric(setup, x), XX)
-    #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-    Λ = SMatrix{N, NC}([ΛΛ[i][a] for a in 1:N, i in 1:NC])
+    Λ = SMatrix{N, NC}(ΛΛ[i][a] for a in 1:N, i in 1:NC)
 
     nα = binomial(P+D, D)
     bdb = Array{T}(undef, nα, nα)
@@ -70,9 +73,11 @@ bernstein_products(T, D, P) = bernstein_products(T, Val(D), Val(P))
 
 @fastmath function integrate_λ(f::F, Λ::SMatrix{N, NC, T}, W::SVector{NC, T}
                                ) where {F, N, NC, T}
-    s = zero(T)
-    @inbounds for n in 1:NC
-        s += W[n] * f(Λ[:, n])
+    @inbounds begin
+        s = zero(W[1] * f(Λ[:, 1]))
+        for n in 1:NC
+            s += W[n] * f(Λ[:, n])
+        end
+        s
     end
-    s
 end

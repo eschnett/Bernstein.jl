@@ -24,8 +24,7 @@ distance along the cardianal axes.
 """
 function barycentric2cartesian(λ::SVector{N, T}) where {N, T}
     D = N-1
-    #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-    SVector{D}([λ[a+1] for a in 1:D])
+    SVector{D}(λ[a+1] for a in 1:D)
 end
 
 
@@ -37,8 +36,7 @@ function cartesian2barycentric(s::SMatrix{D, N, T}, p::SVector{D, T}
     # <https://en.wikipedia.org/wiki/Barycentric_coordinate_system>,
     # section "Conversion between barycentric and Cartesian
     # coordinates":
-    #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-    A = SMatrix{N, N}([i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N])
+    A = SMatrix{N, N}(i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N)
     b = SVector{D+1}(p..., T(1))
     A \ b
 end
@@ -50,8 +48,7 @@ end
 
 function cartesian2barycentric_setup(s::SMatrix{D, N, T}) where {D, N, T}
     @assert N == D+1
-    #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-    A = SMatrix{N, N}([i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N])
+    A = SMatrix{N, N}(i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N)
     BarycentricSetup{N, T}(inv(A))
 end
 
@@ -70,10 +67,8 @@ end
 #     invA = cartesian2barycentric_setup(s)
 #     D = ndims(V)
 #     @assert N == D+1
-#     #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-#     SMatrix{N, N-1}([invA[i,j] for i in 1:N, j in 1:D]),
-#     #TODO <https://github.com/JuliaArrays/StaticArrays.jl/issues/791>
-#     SVector{N}([invA[i,D+1] for i in 1:N])
+#     SMatrix{N, N-1}(invA[i,j] for i in 1:N, j in 1:D],
+#     SVector{N}(invA[i,D+1] for i in 1:N)
 # end
 
 function barycentric2cartesian(s::SMatrix{D, N, T}, λ::SVector{N, T}
