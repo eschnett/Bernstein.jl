@@ -41,6 +41,11 @@ function cartesian2barycentric(s::SMatrix{D, N, T}, p::SVector{D, T}
     A \ b
 end
 
+function cartesian2barycentric(s::SVector{N, SVector{D, T}}, p::SVector{D, T}
+                               ) where {D, N, T}
+    cartesian2barycentric(SMatrix{N, D}(s[j][i] for i in 1:D, j in 1:N), p)
+end
+
 export BarycentricSetup
 @computed struct BarycentricSetup{N, T}
     invA::fulltype(SMatrix{N, N, T})
@@ -50,6 +55,11 @@ function cartesian2barycentric_setup(s::SMatrix{D, N, T}) where {D, N, T}
     @assert N == D+1
     A = SMatrix{N, N}(i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N)
     BarycentricSetup{N, T}(inv(A))
+end
+
+function cartesian2barycentric_setup(s::SVector{N, SVector{D, T}}
+                               ) where {D, N, T}
+    cartesian2barycentric_setup(SMatrix{N, D}(s[j][i] for i in 1:D, j in 1:N))
 end
 
 function cartesian2barycentric(setup::BarycentricSetup{N, T}, p::SVector{D, T}
