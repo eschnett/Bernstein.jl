@@ -43,7 +43,7 @@ end
 
 function cartesian2barycentric(s::SVector{N, SVector{D, T}}, p::SVector{D, T}
                                ) where {D, N, T}
-    cartesian2barycentric(SMatrix{N, D}(s[j][i] for i in 1:D, j in 1:N), p)
+    cartesian2barycentric(SMatrix{D, N}(s[j][i] for i in 1:D, j in 1:N), p)
 end
 
 export BarycentricSetup
