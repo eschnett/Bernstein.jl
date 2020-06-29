@@ -52,10 +52,6 @@ end
     for iter in 1:100
         s = rand(SMatrix{D, N, T})
         p = rand(SVector{D, T})
-        # λ = cartesian2barycentric(p)
-        # @test sum(λ) == 1
-        # p′ = barycentric2cartesian(λ)
-        # @test p == p′
         λ = cartesian2barycentric(s, p)
         @test sum(λ) == 1
         setup = cartesian2barycentric_setup(s)
