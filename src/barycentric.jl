@@ -24,7 +24,7 @@ distance along the cardianal axes.
 """
 function barycentric2cartesian(λ::SVector{N, T}) where {N, T}
     D = N-1
-    SVector{D}(λ[a+1] for a in 1:D)
+    SVector{D, T}(λ[a+1] for a in 1:D)
 end
 
 
@@ -61,13 +61,14 @@ certain operations and is more efficient.
 """
 function cartesian2barycentric_setup(s::SMatrix{D, N, T}) where {D, N, T}
     @assert N == D+1
-    A = SMatrix{N, N}(i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N)
+    A = SMatrix{N, N, T}(i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N)
     BarycentricSetup{N, T}(inv(A))
 end
 
 function cartesian2barycentric_setup(s::SVector{N, SVector{D, T}}
                                ) where {D, N, T}
-    cartesian2barycentric_setup(SMatrix{D, N}(s[j][i] for i in 1:D, j in 1:N))
+    cartesian2barycentric_setup(SMatrix{D, N, T}(
+        s[j][i] for i in 1:D, j in 1:N))
 end
 
 function cartesian2barycentric(setup::BarycentricSetup{N, T}, p::SVector{D, T}

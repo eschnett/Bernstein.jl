@@ -17,7 +17,7 @@ Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
 
 
 
-@testset "Barycentric coordinates for unit simplices D=$D" for D in 1:Dmax
+@testset "Barycentric coordinates for unit simplices D=$D" for D in 0:Dmax
     T = Rat128
     N = D+1
 
@@ -31,7 +31,7 @@ Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
     end
 
     # Test generic algorithm
-    s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
+    s = SMatrix{D, N, T}(T(a+1 == i) for a in 1:D, i in 1:N)
     setup = cartesian2barycentric_setup(s)
     for iter in 1:100
         p = rand(SVector{D, T})
@@ -45,7 +45,7 @@ Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
     end
 end
 
-@testset "Barycentric coordinates for general simplices D=$D" for D in 1:Dmax
+@testset "Barycentric coordinates for general simplices D=$D" for D in 0:Dmax
     T = Rat128
     N = D+1
 
@@ -64,13 +64,17 @@ end
 
 
 
-@testset "Simple Bernstein polynomials D=$D" for D in 1:Dmax
+@testset "Simple Bernstein polynomials D=$D" for D in 0:Dmax
     T = Rat128
     N = D+1
 
-    s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
+    s = SMatrix{D, N, T}(T(a+1 == i) for a in 1:D, i in 1:N)
 
-    if D == 1
+    if D == 0
+        b0() = 1
+        x = SVector{D, T}()
+        @test bernstein(s, SVector(0), x) == b0()
+    elseif D == 1
         b00(x) = oftype(x, 1)
         b01(x) = x
         b10(x) = 1-x
