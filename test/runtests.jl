@@ -32,11 +32,14 @@ Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
 
     # Test generic algorithm
     s = SMatrix{D, N}(T(a+1 == i) for a in 1:D, i in 1:N)
+    setup = cartesian2barycentric_setup(s)
     for iter in 1:100
         p = rand(SVector{D, T})
         λ = cartesian2barycentric(p)
         λ′ = cartesian2barycentric(s, p)
         @test λ == λ′
+        λ′′ = cartesian2barycentric(setup, p)
+        @test λ′′ == λ′
         p′ = barycentric2cartesian(s, λ)
         @test p == p′
     end
@@ -49,9 +52,16 @@ end
     for iter in 1:100
         s = rand(SMatrix{D, N, T})
         p = rand(SVector{D, T})
-        λ = cartesian2barycentric(p)
+        # λ = cartesian2barycentric(p)
+        # @test sum(λ) == 1
+        # p′ = barycentric2cartesian(λ)
+        # @test p == p′
+        λ = cartesian2barycentric(s, p)
         @test sum(λ) == 1
-        p′ = barycentric2cartesian(λ)
+        setup = cartesian2barycentric_setup(s)
+        λ′ = cartesian2barycentric(setup, p)
+        @test λ′ == λ
+        p′ = barycentric2cartesian(s, λ)
         @test p == p′
     end
 end

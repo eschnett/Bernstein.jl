@@ -51,6 +51,14 @@ export BarycentricSetup
     invA::fulltype(SMatrix{N, N, T})
 end
 
+export cartesian2barycentric_setup
+"""
+Prepare to convert Cartesian to barycentric coordinates
+
+The returned `setup` structure can be passed to
+`cartesian2barycentric` instead of the vertices. This pre-calculates
+certain operations and is more efficient.
+"""
 function cartesian2barycentric_setup(s::SMatrix{D, N, T}) where {D, N, T}
     @assert N == D+1
     A = SMatrix{N, N}(i == D+1 ? T(1) : s[i,j] for i in 1:N, j in 1:N)
@@ -59,7 +67,7 @@ end
 
 function cartesian2barycentric_setup(s::SVector{N, SVector{D, T}}
                                ) where {D, N, T}
-    cartesian2barycentric_setup(SMatrix{N, D}(s[j][i] for i in 1:D, j in 1:N))
+    cartesian2barycentric_setup(SMatrix{D, N}(s[j][i] for i in 1:D, j in 1:N))
 end
 
 function cartesian2barycentric(setup::BarycentricSetup{N, T}, p::SVector{D, T}
