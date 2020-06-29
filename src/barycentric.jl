@@ -95,3 +95,9 @@ function barycentric2cartesian(s::SMatrix{D, N, T}, λ::SVector{N, T}
     @assert N == D+1
     s * λ
 end
+
+function barycentric2cartesian(s::SVector{N, SVector{D, T}}, λ::SVector{N, T}
+                               ) where {N, D, T}
+    barycentric2cartesian(SMatrix{D, N, T}(
+        s[j][i] for i in 1:D, j in 1:N))
+end
