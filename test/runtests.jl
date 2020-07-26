@@ -157,7 +157,9 @@ end
 # orthogonal nor normalized)
 const bdbs = Dict{Tuple{Int,Int},Matrix{Float64}}()
 
-@testset "Overlap between Bernstein polynomials D=$D P=$P" for D = 1:Dmax, P = 1:11-2D
+@testset "Overlap between Bernstein polynomials D=$D P=$P" for D = 1:Dmax,
+    P = 1:min(2, 10 - 2D)
+
     T = Float64
     i2α, bdb = bernstein_products(T, D, P)
     bdbs[(D, P)] = bdb
