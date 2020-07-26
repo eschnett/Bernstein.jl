@@ -15,6 +15,15 @@ const Rat128 = Rational{Int128}
 Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
     Rational{T}(T(rand(rng, -1000:1000)) // 1000)
 
+# Check whether all matrix columns are unique
+function unique_columns(A::AbstractArray{T, 2}) where {T}
+    nc = size(A, 2)
+    for i in 1:nc, j in i+1:nc
+        A[:,i] == A[:,j] && return false
+    end
+    return true
+end
+
 
 
 @testset "Barycentric coordinates for unit simplices D=$D" for D in 0:Dmax
@@ -51,6 +60,9 @@ end
 
     for iter in 1:100
         s = rand(SMatrix{D, N, T})
+        while !unique_columns(s)
+            s = rand(SMatrix{D, N, T})
+        end
         p = rand(SVector{D, T})
         λ = cartesian2barycentric(s, p)
         @test sum(λ) == 1
