@@ -16,23 +16,23 @@ Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
     Rational{T}(T(rand(rng, -1000:1000)) // 1000)
 
 # Check whether all matrix columns are unique
-function unique_columns(A::AbstractArray{T, 2}) where {T}
+function unique_columns(A::AbstractArray{T,2}) where {T}
     nc = size(A, 2)
-    for i in 1:nc, j in i+1:nc
-        A[:,i] == A[:,j] && return false
+    for i = 1:nc, j = i+1:nc
+        A[:, i] == A[:, j] && return false
     end
     return true
 end
 
 
 
-@testset "Barycentric coordinates for unit simplices D=$D" for D in 0:Dmax
+@testset "Barycentric coordinates for unit simplices D=$D" for D = 0:Dmax
     T = Rat128
-    N = D+1
+    N = D + 1
 
     # Test simple algorithm
-    for i in 1:100
-        p = rand(SVector{D, T})
+    for i = 1:100
+        p = rand(SVector{D,T})
         λ = cartesian2barycentric(p)
         @test sum(λ) == 1
         p′ = barycentric2cartesian(λ)
@@ -40,10 +40,10 @@ end
     end
 
     # Test generic algorithm
-    s = SMatrix{D, N, T}(T(a+1 == i) for a in 1:D, i in 1:N)
+    s = SMatrix{D,N,T}(T(a + 1 == i) for a = 1:D, i = 1:N)
     setup = cartesian2barycentric_setup(s)
-    for iter in 1:100
-        p = rand(SVector{D, T})
+    for iter = 1:100
+        p = rand(SVector{D,T})
         λ = cartesian2barycentric(p)
         λ′ = cartesian2barycentric(s, p)
         @test λ == λ′
@@ -54,16 +54,16 @@ end
     end
 end
 
-@testset "Barycentric coordinates for general simplices D=$D" for D in 0:Dmax
+@testset "Barycentric coordinates for general simplices D=$D" for D = 0:Dmax
     T = Rat128
-    N = D+1
+    N = D + 1
 
-    for iter in 1:100
-        s = rand(SMatrix{D, N, T})
+    for iter = 1:100
+        s = rand(SMatrix{D,N,T})
         while !unique_columns(s)
-            s = rand(SMatrix{D, N, T})
+            s = rand(SMatrix{D,N,T})
         end
-        p = rand(SVector{D, T})
+        p = rand(SVector{D,T})
         λ = cartesian2barycentric(s, p)
         @test sum(λ) == 1
         setup = cartesian2barycentric_setup(s)
@@ -76,77 +76,77 @@ end
 
 
 
-@testset "Simple Bernstein polynomials D=$D" for D in 0:Dmax
+@testset "Simple Bernstein polynomials D=$D" for D = 0:Dmax
     T = Rat128
-    N = D+1
+    N = D + 1
 
-    s = SMatrix{D, N, T}(T(a+1 == i) for a in 1:D, i in 1:N)
+    s = SMatrix{D,N,T}(T(a + 1 == i) for a = 1:D, i = 1:N)
 
     if D == 0
         b0() = 1
-        x = SVector{D, T}()
+        x = SVector{D,T}()
         @test bernstein(s, SVector(0), x) == b0()
     elseif D == 1
         b00(x) = oftype(x, 1)
         b01(x) = x
-        b10(x) = 1-x
+        b10(x) = 1 - x
         b02(x) = x^2
-        b11(x) = 2*x*(1-x)
-        b20(x) = (1-x)^2
+        b11(x) = 2 * x * (1 - x)
+        b20(x) = (1 - x)^2
         b03(x) = x^3
-        b12(x) = 3*x^2*(1-x)
-        b21(x) = 3*x*(1-x)^2
-        b30(x) = (1-x)^3
-        for x1 in 0:1//3:1
-            x = SVector{D, T}(x1)
-            @test bernstein(s, SVector(0,0), x) == b00(x...)
-            @test bernstein(s, SVector(0,1), x) == b01(x...)
-            @test bernstein(s, SVector(1,0), x) == b10(x...)
-            @test bernstein(s, SVector(0,2), x) == b02(x...)
-            @test bernstein(s, SVector(1,1), x) == b11(x...)
-            @test bernstein(s, SVector(2,0), x) == b20(x...)
-            @test bernstein(s, SVector(0,3), x) == b03(x...)
-            @test bernstein(s, SVector(1,2), x) == b12(x...)
-            @test bernstein(s, SVector(2,1), x) == b21(x...)
-            @test bernstein(s, SVector(3,0), x) == b30(x...)
+        b12(x) = 3 * x^2 * (1 - x)
+        b21(x) = 3 * x * (1 - x)^2
+        b30(x) = (1 - x)^3
+        for x1 = 0:1//3:1
+            x = SVector{D,T}(x1)
+            @test bernstein(s, SVector(0, 0), x) == b00(x...)
+            @test bernstein(s, SVector(0, 1), x) == b01(x...)
+            @test bernstein(s, SVector(1, 0), x) == b10(x...)
+            @test bernstein(s, SVector(0, 2), x) == b02(x...)
+            @test bernstein(s, SVector(1, 1), x) == b11(x...)
+            @test bernstein(s, SVector(2, 0), x) == b20(x...)
+            @test bernstein(s, SVector(0, 3), x) == b03(x...)
+            @test bernstein(s, SVector(1, 2), x) == b12(x...)
+            @test bernstein(s, SVector(2, 1), x) == b21(x...)
+            @test bernstein(s, SVector(3, 0), x) == b30(x...)
         end
     elseif D == 2
-        b000(x,y) = oftype(x, 1)
-        b001(x,y) = y
-        b010(x,y) = x 
-        b100(x,y) = 1 - x - y
-        b002(x,y) = y^2
-        b011(x,y) = 2 * x * y
-        b020(x,y) = x^2
-        b101(x,y) = 2 * (1 - x - y) * y
-        b110(x,y) = 2 * (1 - x - y) * x
-        b200(x,y) = (1 - x - y)^2
-        for x1 in 0:1//4:1//2, x2 in 0:1//4:1//2
-            x = SVector{D, T}(x1, x2)
-            @test bernstein(s, SVector(0,0,0), x) == b000(x...)
-            @test bernstein(s, SVector(0,0,1), x) == b001(x...)
-            @test bernstein(s, SVector(0,1,0), x) == b010(x...)
-            @test bernstein(s, SVector(1,0,0), x) == b100(x...)
-            @test bernstein(s, SVector(0,0,2), x) == b002(x...)
-            @test bernstein(s, SVector(0,1,1), x) == b011(x...)
-            @test bernstein(s, SVector(0,2,0), x) == b020(x...)
-            @test bernstein(s, SVector(1,0,1), x) == b101(x...)
-            @test bernstein(s, SVector(1,1,0), x) == b110(x...)
-            @test bernstein(s, SVector(2,0,0), x) == b200(x...)
-       end
+        b000(x, y) = oftype(x, 1)
+        b001(x, y) = y
+        b010(x, y) = x
+        b100(x, y) = 1 - x - y
+        b002(x, y) = y^2
+        b011(x, y) = 2 * x * y
+        b020(x, y) = x^2
+        b101(x, y) = 2 * (1 - x - y) * y
+        b110(x, y) = 2 * (1 - x - y) * x
+        b200(x, y) = (1 - x - y)^2
+        for x1 = 0:1//4:1//2, x2 = 0:1//4:1//2
+            x = SVector{D,T}(x1, x2)
+            @test bernstein(s, SVector(0, 0, 0), x) == b000(x...)
+            @test bernstein(s, SVector(0, 0, 1), x) == b001(x...)
+            @test bernstein(s, SVector(0, 1, 0), x) == b010(x...)
+            @test bernstein(s, SVector(1, 0, 0), x) == b100(x...)
+            @test bernstein(s, SVector(0, 0, 2), x) == b002(x...)
+            @test bernstein(s, SVector(0, 1, 1), x) == b011(x...)
+            @test bernstein(s, SVector(0, 2, 0), x) == b020(x...)
+            @test bernstein(s, SVector(1, 0, 1), x) == b101(x...)
+            @test bernstein(s, SVector(1, 1, 0), x) == b110(x...)
+            @test bernstein(s, SVector(2, 0, 0), x) == b200(x...)
+        end
     elseif D == 3
-        b0000(x,y,z) = oftype(x, 1)
-        b0001(x,y,z) = z
-        b0010(x,y,z) = y
-        b0100(x,y,z) = x 
-        b1000(x,y,z) = 1 - x - y - z
-        for x1 in 0:1//2:1//2, x2 in 0:1//2:1//2, x3 in 0:1//2:1//2
-            x = SVector{D, T}(x1, x2, x3)
-            @test bernstein(s, SVector(0,0,0,0), x) == b0000(x...)
-            @test bernstein(s, SVector(0,0,0,1), x) == b0001(x...)
-            @test bernstein(s, SVector(0,0,1,0), x) == b0010(x...)
-            @test bernstein(s, SVector(0,1,0,0), x) == b0100(x...)
-            @test bernstein(s, SVector(1,0,0,0), x) == b1000(x...)
+        b0000(x, y, z) = oftype(x, 1)
+        b0001(x, y, z) = z
+        b0010(x, y, z) = y
+        b0100(x, y, z) = x
+        b1000(x, y, z) = 1 - x - y - z
+        for x1 = 0:1//2:1//2, x2 = 0:1//2:1//2, x3 = 0:1//2:1//2
+            x = SVector{D,T}(x1, x2, x3)
+            @test bernstein(s, SVector(0, 0, 0, 0), x) == b0000(x...)
+            @test bernstein(s, SVector(0, 0, 0, 1), x) == b0001(x...)
+            @test bernstein(s, SVector(0, 0, 1, 0), x) == b0010(x...)
+            @test bernstein(s, SVector(0, 1, 0, 0), x) == b0100(x...)
+            @test bernstein(s, SVector(1, 0, 0, 0), x) == b1000(x...)
         end
     end
 end
@@ -155,14 +155,14 @@ end
 
 # Overlap integrals between Bernstein polynomials (which are neither
 # orthogonal nor normalized)
-const bdbs = Dict{Tuple{Int, Int}, Matrix{Float64}}()
+const bdbs = Dict{Tuple{Int,Int},Matrix{Float64}}()
 
-@testset "Overlap between Bernstein polynomials D=$D P=$P" for D in 1:Dmax, P in 1:11-2D
+@testset "Overlap between Bernstein polynomials D=$D P=$P" for D = 1:Dmax, P = 1:11-2D
     T = Float64
     i2α, bdb = bernstein_products(T, D, P)
-    bdbs[(D,P)] = bdb
+    bdbs[(D, P)] = bdb
     # println("|(D=$D,P=$P)|=$(length(bdb))")
-    nα = binomial(P+D, D)
+    nα = binomial(P + D, D)
     @test size(bdb) == (nα, nα)
 end
 
