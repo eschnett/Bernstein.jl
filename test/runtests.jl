@@ -1,5 +1,6 @@
 using Bernstein
 
+using LinearAlgebra
 using Random
 using SimplexQuad
 using StaticArrays
@@ -10,7 +11,8 @@ const Dmax = 5
 const Rat128 = Rational{Int128}
 
 # Random rationals
-function Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T}
+function Base.rand(rng::AbstractRNG,
+                   ::Random.SamplerType{Rational{T}}) where {T}
     return Rational{T}(T(rand(rng, -1000:1000)) // 1000)
 end
 
@@ -21,6 +23,54 @@ function unique_rows(A::AbstractArray{T,2}) where {T}
         A[i, :] == A[j, :] && return false
     end
     return true
+end
+
+@testset "Barycentric coordinates for orthogonal simplices D=$D" for D in 0:Dmax
+    T = Rat128
+    N = D + 1
+
+    # Define standard simplex
+    s = SVector{N,SVector{D,T}}(SVector{D,T}(a + 1 == i for a in 1:D)
+                                for i in 1:N)
+
+    # Test corners
+    for i in 1:N
+        p = SVector{D,T}(a + 1 == i for a in 1:D)
+        λ = cartesian2barycentric(s, p)
+        @test λ == SVector{N,T}(a == i for a in 1:N)
+    end
+
+    for iter in 1:10
+        # Test random interior points
+        p = abs.(rand(SVector{D,T}))
+        while sum(abs.(p)) > 1
+            p = abs.(rand(SVector{D,T}))
+        end
+        λ = cartesian2barycentric(s, p)
+        @test all(0 <= λi <= 1 for λi in λ)
+    end
+
+    for iter in 1:10
+        # Find random affine transformation
+        A = rand(SMatrix{D,D,T})
+        while det(A) <= 0
+            A = rand(SMatrix{D,D,T})
+        end
+        b = rand(SVector{D,T})
+        s′ = map(x -> A * x + b, s)
+
+        # Test random interior points
+        for iter2 in 1:10
+            p = abs.(rand(SVector{D,T}))
+            while sum(abs.(p)) > 1
+                p = abs.(rand(SVector{D,T}))
+            end
+            p′ = A * p + b
+
+            λ = cartesian2barycentric(s, p)
+            @test all(0 <= λi <= 1 for λi in λ)
+        end
+    end
 end
 
 @testset "Barycentric coordinates for general simplices D=$D" for D in 0:Dmax
