@@ -5,33 +5,29 @@ using SimplexQuad
 using StaticArrays
 using Test
 
-
-
 const Dmax = 5
 
 const Rat128 = Rational{Int128}
 
 # Random rationals
-Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} = Rational{T}(T(rand(rng,
-                                                                                              -1000:1000)) //
-                                                                                       1000)
+function Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T}
+    return Rational{T}(T(rand(rng, -1000:1000)) // 1000)
+end
 
 # Check whether all matrix rows are unique
 function unique_rows(A::AbstractArray{T,2}) where {T}
     nr = size(A, 1)
-    for i = 1:nr, j = i+1:nr
+    for i in 1:nr, j in (i + 1):nr
         A[i, :] == A[j, :] && return false
     end
     return true
 end
 
-
-
-@testset "Barycentric coordinates for general simplices D=$D" for D = 0:Dmax
+@testset "Barycentric coordinates for general simplices D=$D" for D in 0:Dmax
     T = Rat128
     N = D + 1
 
-    for iter = 1:100
+    for iter in 1:100
         s = rand(SMatrix{N,D,T})
         while !unique_rows(s)
             s = rand(SMatrix{N,D,T})
@@ -45,8 +41,8 @@ end
         p′ = barycentric2cartesian(s, λ)
         @test p′ == p
 
-        s2 = SVector{N,SVector{D,T}}(SVector{D,T}(s[i, a] for a = 1:D)
-                                     for i = 1:N)
+        s2 = SVector{N,SVector{D,T}}(SVector{D,T}(s[i, a] for a in 1:D)
+                                     for i in 1:N)
         p2 = p
         λ2 = cartesian2barycentric(s2, p2)
         @test λ2 == λ
@@ -58,13 +54,11 @@ end
     end
 end
 
-
-
-@testset "Simple Bernstein polynomials D=$D" for D = 0:Dmax
+@testset "Simple Bernstein polynomials D=$D" for D in 0:Dmax
     T = Rat128
     N = D + 1
 
-    s = SMatrix{N,D,T}(T(a + 1 == i) for i = 1:N, a = 1:D)
+    s = SMatrix{N,D,T}(T(a + 1 == i) for i in 1:N, a in 1:D)
 
     if D == 0
         b0() = 1
@@ -81,7 +75,7 @@ end
         b12(x) = 3 * x^2 * (1 - x)
         b21(x) = 3 * x * (1 - x)^2
         b30(x) = (1 - x)^3
-        for x1 = 0:1//3:1
+        for x1 in 0:(1 // 3):1
             x = SVector{D,T}(x1)
             @test bernstein(s, SVector(0, 0), x) == b00(x...)
             @test bernstein(s, SVector(0, 1), x) == b01(x...)
@@ -105,7 +99,7 @@ end
         b101(x, y) = 2 * (1 - x - y) * y
         b110(x, y) = 2 * (1 - x - y) * x
         b200(x, y) = (1 - x - y)^2
-        for x1 = 0:1//4:1//2, x2 = 0:1//4:1//2
+        for x1 in 0:(1 // 4):(1 // 2), x2 in 0:(1 // 4):(1 // 2)
             x = SVector{D,T}(x1, x2)
             @test bernstein(s, SVector(0, 0, 0), x) == b000(x...)
             @test bernstein(s, SVector(0, 0, 1), x) == b001(x...)
@@ -124,7 +118,10 @@ end
         b0010(x, y, z) = y
         b0100(x, y, z) = x
         b1000(x, y, z) = 1 - x - y - z
-        for x1 = 0:1//2:1//2, x2 = 0:1//2:1//2, x3 = 0:1//2:1//2
+        for x1 in 0:(1 // 2):(1 // 2),
+x2 in 0:(1 // 2):(1 // 2),
+x3 in 0:(1 // 2):(1 // 2)
+
             x = SVector{D,T}(x1, x2, x3)
             @test bernstein(s, SVector(0, 0, 0, 0), x) == b0000(x...)
             @test bernstein(s, SVector(0, 0, 0, 1), x) == b0001(x...)
@@ -135,14 +132,12 @@ end
     end
 end
 
-
-
 # Overlap integrals between Bernstein polynomials (which are neither
 # orthogonal nor normalized)
 const bdbs = Dict{Tuple{Int,Int},Matrix{Float64}}()
 
-@testset "Overlap between Bernstein polynomials D=$D P=$P" for D = 1:Dmax,
-P = 1:min(2, 10 - 2D)
+@testset "Overlap between Bernstein polynomials D=$D P=$P" for D in 1:Dmax,
+P in 1:min(2, 10 - 2D)
 
     T = Float64
     i2α, bdb = bernstein_products(T, D, P)
@@ -151,8 +146,6 @@ P = 1:min(2, 10 - 2D)
     nα = binomial(P + D, D)
     @test size(bdb) == (nα, nα)
 end
-
-
 
 #TODO """
 #TODO Integrate a function f over a simplex using Gauss quadrature

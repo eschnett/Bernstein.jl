@@ -8,14 +8,14 @@ orthogonal nor normalized)
 function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T,D,P}
     N = D + 1
 
-    s = SMatrix{N,D}(T(a + 1 == i) for i = 1:N, a = 1:D)
+    s = SMatrix{N,D}(T(a + 1 == i) for i in 1:N, a in 1:D)
 
     NP = P                # number of integration points per dimension
     NC = NP^D             # total number of integration points
     X1, W1 = simplexquad(NP, collect(s))
     @assert size(X1) == (NC, D)
     @assert size(W1) == (NC,)
-    X = [SVector{D,T}(X1[n, a] for a = 1:D) for n = 1:NC]
+    X = [SVector{D,T}(X1[n, a] for a in 1:D) for n in 1:NC]
     X::Vector{SVector{D,T}}
     # dump(X)
     W = W1
@@ -37,7 +37,7 @@ function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T,D,P}
     αmax = CartesianIndex(ntuple(d -> P, N))
 
     i = 0
-    for αiI = αmin:αmax
+    for αiI in αmin:αmax
         αi = SVector(αiI.I)
         sum(αi) == P || continue
         i += 1
@@ -45,7 +45,7 @@ function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T,D,P}
         i2α[i] = αi
 
         j = 0
-        for αjI = αmin:αmax
+        for αjI in αmin:αmax
             αj = SVector(αjI.I)
             sum(αj) == P || continue
             j += 1
@@ -59,17 +59,15 @@ function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T,D,P}
     end
     @assert i == nα
 
-    i2α, Symmetric(bdb)
+    return i2α, Symmetric(bdb)
 end
 
 bernstein_products(T, D, P) = bernstein_products(T, Val(D), Val(P))
 
-
-
 @fastmath function integrate_λ(f::F, Λ::Vector{SVector{N,T}},
                                W::Vector{T}) where {F,N,T}
     @assert length(Λ) == length(W) > 0
-    @inbounds begin
+    return @inbounds begin
         s = zero(W[1] * f(Λ[1]))
         for (λ, w) in Iterators.zip(Λ, W)
             s += w * f(λ)
