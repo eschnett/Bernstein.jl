@@ -43,7 +43,17 @@ end
         λ′ = cartesian2barycentric(setup, p)
         @test λ′ == λ
         p′ = barycentric2cartesian(s, λ)
-        @test p == p′
+        @test p′ == p
+
+        s2 = SVector{N,SVector{D,T}}(SVector{D,T}(s[i,a] for a in 1:D) for i in 1:N)
+        p2 = p
+        λ2 = cartesian2barycentric(s2, p2)
+        @test λ2 == λ
+        setup2 = cartesian2barycentric_setup(s2)
+        λ2′ = cartesian2barycentric(setup2, p2)
+        @test λ2′ == λ′
+        p2′ = barycentric2cartesian(s2, λ2)
+        @test p2′ == p′
     end
 end
 

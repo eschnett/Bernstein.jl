@@ -29,7 +29,7 @@ end
 
 function cartesian2barycentric(s::SVector{N,SVector{D,T}},
                                p::SVector{D,T}) where {D,N,T}
-    cartesian2barycentric(SMatrix{N,D}(s[i][j] for i = 1:D, j = 1:N), p)
+    cartesian2barycentric(SMatrix{N,D,T}(s[i][j] for i = 1:N, j = 1:D), p)
 end
 
 
@@ -58,12 +58,12 @@ pre-calculates certain operations and is more efficient.
 """
 function cartesian2barycentric_setup(s::SMatrix{N,D,T}) where {N,D,T}
     @assert N == D + 1
-    A = SMatrix{N,N,T}(i == D + 1 ? T(1) : s[j, i] for i = 1:N, j = 1:N)
+    A = SMatrix{N,N,T}(j == D + 1 ? T(1) : s[i, j] for j = 1:N, i = 1:N)
     BarycentricSetup{N,T}(inv(A))
 end
 
 function cartesian2barycentric_setup(s::SVector{N,SVector{D,T}}) where {D,N,T}
-    cartesian2barycentric_setup(SMatrix{N,D,T}(s[i][j] for i = 1:D, j = 1:N))
+    cartesian2barycentric_setup(SMatrix{N,D,T}(s[i][j] for i = 1:N, j = 1:D))
 end
 
 function cartesian2barycentric(setup::BarycentricSetup{N,T},
@@ -94,5 +94,5 @@ end
 
 function barycentric2cartesian(s::SVector{N,SVector{D,T}},
                                λ::SVector{N,T}) where {N,D,T}
-    barycentric2cartesian(SMatrix{N,D,T}(s[i][j] for i = 1:D, j = 1:N), λ)
+    barycentric2cartesian(SMatrix{N,D,T}(s[i][j] for i = 1:N, j = 1:D), λ)
 end
