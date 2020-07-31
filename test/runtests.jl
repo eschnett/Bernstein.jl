@@ -12,56 +12,29 @@ const Dmax = 5
 const Rat128 = Rational{Int128}
 
 # Random rationals
-Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} =
-    Rational{T}(T(rand(rng, -1000:1000)) // 1000)
+Base.rand(rng::AbstractRNG, ::Random.SamplerType{Rational{T}}) where {T} = Rational{T}(T(rand(rng,
+                                                                                              -1000:1000)) //
+                                                                                       1000)
 
-# Check whether all matrix columns are unique
-function unique_columns(A::AbstractArray{T,2}) where {T}
-    nc = size(A, 2)
-    for i = 1:nc, j = i+1:nc
-        A[:, i] == A[:, j] && return false
+# Check whether all matrix rows are unique
+function unique_rows(A::AbstractArray{T,2}) where {T}
+    nr = size(A, 1)
+    for i = 1:nr, j = i+1:nr
+        A[i, :] == A[j, :] && return false
     end
     return true
 end
 
 
 
-@testset "Barycentric coordinates for unit simplices D=$D" for D = 0:Dmax
-    T = Rat128
-    N = D + 1
-
-    # Test simple algorithm
-    for i = 1:100
-        p = rand(SVector{D,T})
-        λ = cartesian2barycentric(p)
-        @test sum(λ) == 1
-        p′ = barycentric2cartesian(λ)
-        @test p == p′
-    end
-
-    # Test generic algorithm
-    s = SMatrix{D,N,T}(T(a + 1 == i) for a = 1:D, i = 1:N)
-    setup = cartesian2barycentric_setup(s)
-    for iter = 1:100
-        p = rand(SVector{D,T})
-        λ = cartesian2barycentric(p)
-        λ′ = cartesian2barycentric(s, p)
-        @test λ == λ′
-        λ′′ = cartesian2barycentric(setup, p)
-        @test λ′′ == λ′
-        p′ = barycentric2cartesian(s, λ)
-        @test p == p′
-    end
-end
-
 @testset "Barycentric coordinates for general simplices D=$D" for D = 0:Dmax
     T = Rat128
     N = D + 1
 
     for iter = 1:100
-        s = rand(SMatrix{D,N,T})
-        while !unique_columns(s)
-            s = rand(SMatrix{D,N,T})
+        s = rand(SMatrix{N,D,T})
+        while !unique_rows(s)
+            s = rand(SMatrix{N,D,T})
         end
         p = rand(SVector{D,T})
         λ = cartesian2barycentric(s, p)
@@ -80,7 +53,7 @@ end
     T = Rat128
     N = D + 1
 
-    s = SMatrix{D,N,T}(T(a + 1 == i) for a = 1:D, i = 1:N)
+    s = SMatrix{N,D,T}(T(a + 1 == i) for i = 1:N, a = 1:D)
 
     if D == 0
         b0() = 1
@@ -158,7 +131,7 @@ end
 const bdbs = Dict{Tuple{Int,Int},Matrix{Float64}}()
 
 @testset "Overlap between Bernstein polynomials D=$D P=$P" for D = 1:Dmax,
-    P = 1:min(2, 10 - 2D)
+P = 1:min(2, 10 - 2D)
 
     T = Float64
     i2α, bdb = bernstein_products(T, D, P)

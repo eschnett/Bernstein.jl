@@ -8,26 +8,21 @@ orthogonal nor normalized)
 function bernstein_products(::Type{T}, ::Val{D}, ::Val{P}) where {T,D,P}
     N = D + 1
 
-    s = SMatrix{D,N}(T(a + 1 == i) for a = 1:D, i = 1:N)
+    s = SMatrix{N,D}(T(a + 1 == i) for i = 1:N, a = 1:D)
 
     NP = P                # number of integration points per dimension
     NC = NP^D             # total number of integration points
-    X1, W1 = simplexquad(NP, collect(s)')
+    X1, W1 = simplexquad(NP, collect(s))
     @assert size(X1) == (NC, D)
     @assert size(W1) == (NC,)
-    X = SMatrix{D,NC}(X1')
-    dump(X)
-    W = SVector{NC}(W1)
+    X = [SVector{D,T}(X1[n, a] for a = 1:D) for n = 1:NC]
+    X::Vector{SVector{D,T}}
+    # dump(X)
+    W = W1
 
     setup = bernstein_setup(s)
-    # XX = SVector{NC}([X[:,i] for i in 1:NC])
-    # SVectors containing SVectors cause problems. We use the
-    # "Identity" type to hide the inner SVectors while constructing
-    # the outer ones.
-    # XX = SVector{NC}(X[:,i] for i in 1:NC)
-    XX = getindex.(SVector{NC}(Identity(X[:, i]) for i = 1:NC))
-    ΛΛ = map(x -> cartesian2barycentric(setup, x), XX)
-    Λ = SMatrix{N,NC}(ΛΛ[i][a] for a = 1:N, i = 1:NC)
+    Λ = [cartesian2barycentric(setup, x) for x in X]
+    Λ::Vector{SVector{N,T}}
 
     nα = binomial(P + D, D)
     bdb = Array{T}(undef, nα, nα)
@@ -71,12 +66,14 @@ bernstein_products(T, D, P) = bernstein_products(T, Val(D), Val(P))
 
 
 
-@fastmath function integrate_λ(f::F, Λ::SMatrix{N,NC,T}, W::SVector{NC,T}) where {F,N,NC,T}
+@fastmath function integrate_λ(f::F, Λ::Vector{SVector{N,T}},
+                               W::Vector{T}) where {F,N,T}
+    @assert length(Λ) == length(W) > 0
     @inbounds begin
-        s = zero(W[1] * f(Λ[:, 1]))
-        for n = 1:NC
-            s += W[n] * f(Λ[:, n])
+        s = zero(W[1] * f(Λ[1]))
+        for (λ, w) = Iterators.zip(Λ, W)
+            s += w * f(λ)
         end
-        s
+        return s
     end
 end
