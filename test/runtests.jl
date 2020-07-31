@@ -45,7 +45,8 @@ end
         p′ = barycentric2cartesian(s, λ)
         @test p′ == p
 
-        s2 = SVector{N,SVector{D,T}}(SVector{D,T}(s[i,a] for a in 1:D) for i in 1:N)
+        s2 = SVector{N,SVector{D,T}}(SVector{D,T}(s[i, a] for a = 1:D)
+                                     for i = 1:N)
         p2 = p
         λ2 = cartesian2barycentric(s2, p2)
         @test λ2 == λ

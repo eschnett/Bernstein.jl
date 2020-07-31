@@ -71,7 +71,7 @@ bernstein_products(T, D, P) = bernstein_products(T, Val(D), Val(P))
     @assert length(Λ) == length(W) > 0
     @inbounds begin
         s = zero(W[1] * f(Λ[1]))
-        for (λ, w) = Iterators.zip(Λ, W)
+        for (λ, w) in Iterators.zip(Λ, W)
             s += w * f(λ)
         end
         return s
