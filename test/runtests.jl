@@ -10,10 +10,13 @@ const Dmax = 5
 
 const Rat128 = Rational{Int128}
 
+# Set reproducible random number seed
+Random.seed!(0)
+
 # Random rationals
 function Base.rand(rng::AbstractRNG,
                    ::Random.SamplerType{Rational{T}}) where {T}
-    return Rational{T}(T(rand(rng, -1000:1000)) // 1000)
+    return Rational{T}(T(rand(rng, -1000:1000))//1000)
 end
 
 # Check whether all matrix rows are unique
@@ -125,7 +128,7 @@ end
         b12(x) = 3 * x^2 * (1 - x)
         b21(x) = 3 * x * (1 - x)^2
         b30(x) = (1 - x)^3
-        for x1 in 0:(1 // 3):1
+        for x1 in 0:(1//3):1
             x = SVector{D,T}(x1)
             @test bernstein(s, SVector(0, 0), x) == b00(x...)
             @test bernstein(s, SVector(0, 1), x) == b01(x...)
@@ -149,7 +152,7 @@ end
         b101(x, y) = 2 * (1 - x - y) * y
         b110(x, y) = 2 * (1 - x - y) * x
         b200(x, y) = (1 - x - y)^2
-        for x1 in 0:(1 // 4):(1 // 2), x2 in 0:(1 // 4):(1 // 2)
+        for x1 in 0:(1//4):(1//2), x2 in 0:(1//4):(1//2)
             x = SVector{D,T}(x1, x2)
             @test bernstein(s, SVector(0, 0, 0), x) == b000(x...)
             @test bernstein(s, SVector(0, 0, 1), x) == b001(x...)
@@ -168,10 +171,7 @@ end
         b0010(x, y, z) = y
         b0100(x, y, z) = x
         b1000(x, y, z) = 1 - x - y - z
-        for x1 in 0:(1 // 2):(1 // 2),
-x2 in 0:(1 // 2):(1 // 2),
-x3 in 0:(1 // 2):(1 // 2)
-
+        for x1 in 0:(1//2):(1//2), x2 in 0:(1//2):(1//2), x3 in 0:(1//2):(1//2)
             x = SVector{D,T}(x1, x2, x3)
             @test bernstein(s, SVector(0, 0, 0, 0), x) == b0000(x...)
             @test bernstein(s, SVector(0, 0, 0, 1), x) == b0001(x...)
