@@ -1,18 +1,18 @@
 name = "Bernstein"
 uuid = "e9b0fb4c-9cb7-4f61-9c14-701a41c684d7"
 authors = ["Erik Schnetter <schnetter@gmail.com>"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 ComputedFieldTypes = "459fdd68-db75-56b8-8c15-d717a790f88e"
+GrundmannMoeller = "36aa67b7-9d79-4e90-bbc0-05abd90a007e"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-SimplexQuad = "f5de1e94-2f77-472d-8c3b-9d09f580ee5e"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 ComputedFieldTypes = "0.1.0"
-SimplexQuad = "1.0.0"
+GrundmannMoeller = "0.1.1"
 StaticArrays = "0.12.4"
 julia = "1.4"

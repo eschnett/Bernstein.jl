@@ -4,8 +4,8 @@ Bernstein basis functions for simplices
 module Bernstein
 
 using ComputedFieldTypes
+using GrundmannMoeller
 using LinearAlgebra
-using SimplexQuad
 using StaticArrays
 
 struct Identity{T}
