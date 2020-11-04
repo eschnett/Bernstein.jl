@@ -1,7 +1,7 @@
 name = "Bernstein"
 uuid = "e9b0fb4c-9cb7-4f61-9c14-701a41c684d7"
 authors = ["Erik Schnetter <schnetter@gmail.com>"]
-version = "0.2.3"
+version = "1.0.0"
 
 [deps]
 ComputedFieldTypes = "459fdd68-db75-56b8-8c15-d717a790f88e"

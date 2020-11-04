@@ -7,7 +7,7 @@ export cartesian2barycentric
 Convert Cartesian to barycentric coordinates.
 
 # Arguments
-- `s`: Simplex vertices in Cartesian coordinates. `s` has `N=D+1`
+- `s`: Simplex vertices in Cartesian coordinates. `s` has `N ≤ D + 1`
   vertices in `D` dimensions.
 - `p`: Point in Cartesian coordinates
 
@@ -15,7 +15,7 @@ Convert Cartesian to barycentric coordinates.
 - `λ`: Point in barycentric coordinates
 """
 function cartesian2barycentric(s::SMatrix{N,D,T}, p::SVector{D,T}) where {N,D,T}
-    @assert N == D + 1
+    @assert N ≤ D + 1
     # Algorithm as described on
     # <https://en.wikipedia.org/wiki/Barycentric_coordinate_system>,
     # section "Conversion between barycentric and Cartesian
@@ -78,7 +78,7 @@ export barycentric2cartesian
 Convert barycentric to Cartesian coordinates.
 
 # Arguments
-- `s`: Simplex vertices in Cartesian coordinates. `s` has `N=D+1`
+- `s`: Simplex vertices in Cartesian coordinates. `s` has `N ≤ D + 1`
   vertices in `D` dimensions.
 - `λ`: Point in barycentric coordinates
 
@@ -86,7 +86,7 @@ Convert barycentric to Cartesian coordinates.
 - `p`: Point in Cartesian coordinates
 """
 function barycentric2cartesian(s::SMatrix{N,D,T}, λ::SVector{N,T}) where {N,D,T}
-    @assert N == D + 1
+    @assert N ≤ D + 1
     return s' * λ
 end
 
