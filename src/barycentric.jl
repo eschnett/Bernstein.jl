@@ -20,7 +20,8 @@ function cartesian2barycentric(s::SMatrix{N,D,T}, p::SVector{D,T}) where {N,D,T}
     # <https://en.wikipedia.org/wiki/Barycentric_coordinate_system>,
     # section "Conversion between barycentric and Cartesian
     # coordinates"
-    A = SMatrix{N,N}(i == D + 1 ? T(1) : s[j, i] for i in 1:N, j in 1:N)
+    A = SMatrix{D + 1,N}(i == D + 1 ? T(1) : s[j, i]
+                         for i in 1:(D + 1), j in 1:N)
     b = SVector{D + 1}(p..., T(1))
     return A \ b
 end
