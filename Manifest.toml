@@ -15,9 +15,9 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[GrundmannMoeller]]
 deps = ["LinearAlgebra", "StaticArrays", "Test"]
-git-tree-sha1 = "9537b415b1bf50c403f7e431e268d34f19434197"
+git-tree-sha1 = "e264cf5f081091e4af712a911d3b620567c565e3"
 uuid = "36aa67b7-9d79-4e90-bbc0-05abd90a007e"
-version = "0.1.1"
+version = "0.1.2"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
@@ -53,9 +53,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "da4cf579416c81994afd6322365d00916c79b8ae"
+git-tree-sha1 = "9da72ed50e94dbff92036da395275ed114e04d49"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.12.5"
+version = "1.0.1"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
