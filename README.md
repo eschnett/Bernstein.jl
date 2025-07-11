@@ -16,7 +16,7 @@ coordinates](https://en.wikipedia.org/wiki/Barycentric_coordinate_system).
 
 ### Convert between Cartesian and barycentric coordinates
 
-```Julia
+```julia
 julia> using StaticArrays
 
 julia> using Bernstein
@@ -58,7 +58,7 @@ If you convert many Cartesian to barycentric coordinates, then part of
 the transformation can be pre-calculated to increase efficiency. Call
 `cartesian2barycentric_setup` for this:
 
-```Julia
+```julia
 julia> using StaticArrays
 
 julia> using Bernstein
@@ -92,7 +92,7 @@ julia> # Convert to barycentric coordinates
 You can evaluate Bernstein polynomials from barycentric coordinates or
 from Cartesian coordinates:
 
-```Julia
+```julia
 julia> using StaticArrays
 
 julia> using Bernstein
@@ -129,6 +129,26 @@ julia> bernstein(s, α, p)
 
 julia> bernstein(setup, α, p)
 3.523588891718682
+```
+
+### 1D Bernstein polynomials
+
+For 1D polynomials are defined in the interval [0,1].
+Polynomial of order `n` and index `ν`,
+
+```math
+B_{ν,n}(x) = \binom{n}{ν} x^ν (1-x)^{n-ν}
+```
+in [Wikipedia conventions](https://en.wikipedia.org/wiki/Bernstein_polynomial), can be called as:
+
+```julia
+using Bernstein, Bernstein.StaticArrays
+
+function bernstein_1d(ν::Int, n::Int, x::Number)
+    λ = SVector(1.0 - x, x)
+    α = SVector(n - ν, ν)
+    return bernstein(α, λ)
+end
 ```
 
 ## References
